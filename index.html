@@ -14,10 +14,18 @@
       text-align: center;
       padding: 50px;
     }
-    img { width: 300px; margin-bottom: 30px; border-radius: 20px; box-shadow: 0 0 20px #00ffcc; }
-    h1 { font-size: 28px; margin-bottom: 20px; }
+    img {
+      width: 300px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 20px #00ffcc;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
     button {
-      padding: 15px 30px;
+      padding: 15px 32px;
       font-size: 18px;
       background: linear-gradient(45deg, #00ccff, #00ffcc);
       border: none;
@@ -25,25 +33,46 @@
       font-weight: bold;
       margin: 10px;
       cursor: pointer;
-      box-shadow: 0 0 12px #00ffcc;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+    #popup {
+      background: rgba(0, 255, 204, 0.15);
+      border: 1px solid #00ffcc;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 300px;
+      border-radius: 12px;
+      display: none;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <h1>Unlock the Lucky Wheel</h1>
-  <img src="Unlock.png" alt="Unlock" />
-  <p>Win real TIFFY tokens on every spin!</p>
-  <button onclick="checkClaim()">Unlock with Claim</button>
-  <button onclick="payToUnlock()">Unlock with 0.5 TIFFY</button>
+  <img src="Unlock.png" alt="Unlock Wheel" />
+  <p>Win up to $60 TIFFY per spin!</p>
+  <button onclick="handleClaimUnlock()">Unlock with Claim</button>
+
+  <div id="popup">
+    <p id="popupMessage">Clipboard ready...</p>
+    <button onclick="proceedWalletConnect()">OK, Launch Wallet</button>
+  </div>
 
   <script>
+    const UNLOCK_LINK = "https://tiffyai.github.io/Unlock/";
+    const CLAIM_LINK = "https://tiffyai.github.io/Claim/";
+    const WHEEL_LINK = "https://tiffyai.github.io/Lucky-Wheel/";
     const contractAddress = "0x6df97Ec32401e23dEDB2E6cAF3035155890DC237";
-    const receiverAddress = "0xed9b43bED20B063ae0966C0AEC446bc755fB84bA";
+
     const ABI = [
       { "inputs": [], "name": "decimals", "outputs": [{ "type": "uint8" }], "stateMutability": "view", "type": "function" },
-      { "inputs": [{ "name": "", "type": "address" }], "name": "lastClaimed", "outputs": [{ "type": "uint256" }], "stateMutability": "view", "type": "function" },
-      { "inputs": [{ "name": "recipient", "type": "address" }, { "name": "amount", "type": "uint256" }], "name": "transfer", "outputs": [{ "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }
+      { "inputs": [{ "name": "", "type": "address" }], "name": "lastClaimed", "outputs": [{ "type": "uint256" }], "stateMutability": "view", "type": "function" }
     ];
+
     const providerOptions = {
       walletconnect: {
         package: window.WalletConnectProvider.default,
@@ -53,40 +82,38 @@
         }
       }
     };
+
     const web3Modal = new window.Web3Modal.default({ cacheProvider: false, providerOptions });
+    let web3, user, contract;
 
-    let web3, contract, user;
+    function handleClaimUnlock() {
+      // Copy link to clipboard
+      navigator.clipboard.writeText(UNLOCK_LINK).then(() => {
+        // Show popup
+        const popup = document.getElementById("popup");
+        document.getElementById("popupMessage").innerText =
+          "Hey! Let’s head over to your DApp — the link is already copied. Paste it into your wallet’s browser.";
+        popup.style.display = "block";
+      });
+    }
 
-    async function connect() {
+    async function proceedWalletConnect() {
       const instance = await web3Modal.connect();
       web3 = new Web3(instance);
       const accounts = await web3.eth.getAccounts();
       user = accounts[0];
       contract = new web3.eth.Contract(ABI, contractAddress);
-    }
 
-    async function checkClaim() {
-      await connect();
       const lastClaimed = await contract.methods.lastClaimed(user).call();
       const now = Math.floor(Date.now() / 1000);
-      if (now >= parseInt(lastClaimed) + 86400) {
-        alert("Unlocked! Redirecting...");
-        window.location.href = "wheel.html";
-      } else {
-        alert("You’ve already claimed today. Try the pay option.");
-      }
-    }
 
-    async function payToUnlock() {
-      await connect();
-      const decimals = await contract.methods.decimals().call();
-      const amount = (0.5 * (10 ** decimals)).toString();
-      try {
-        await contract.methods.transfer(receiverAddress, amount).send({ from: user });
-        alert("Payment successful! Redirecting to wheel...");
-        window.location.href = "wheel.html";
-      } catch (err) {
-        alert("Payment failed. " + err.message);
+      if (now < parseInt(lastClaimed) + 86400) {
+        // Already claimed — allow access to wheel
+        window.location.href = WHEEL_LINK;
+      } else {
+        // Not claimed yet — ask to claim
+        const goClaim = confirm("Seems you haven’t claimed yet today. Wanna go claim now?");
+        if (goClaim) window.location.href = CLAIM_LINK;
       }
     }
   </script>
