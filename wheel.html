@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Spin the Lucky Wheel</title>
+  <style>
+    body {
+      background: radial-gradient(circle, #000, #111);
+      color: gold;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    #wheel-container {
+      position: relative;
+      width: 600px;
+      margin: 50px auto;
+    }
+    #arrow {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 80px solid red;
+    }
+    #wheel {
+      width: 100%;
+      border-radius: 50%;
+      border: 12px solid gold;
+      box-shadow: 0 0 30px gold;
+      transition: transform 5s ease-out;
+    }
+    #spinButton {
+      margin-top: 30px;
+      padding: 18px 36px;
+      font-size: 22px;
+      background: linear-gradient(45deg, gold, #fff176);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 15px gold;
+    }
+    #popup {
+      margin-top: 30px;
+      font-size: 26px;
+      color: #00ffcc;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spin & Win Real TIFFY!</h1>
+  <div id="wheel-container">
+    <div id="arrow"></div>
+    <img id="wheel" src="wheel.png" alt="Lucky Wheel" />
+  </div>
+  <button id="spinButton">Spin Now</button>
+  <div id="popup"></div>
+  <audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/08/04/audio_72a5754f82.mp3"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
+  <script>
+    const BACKEND_API = "https://tiffyai-wh-wa.onrender.com/reward"; // Your Render URL
+    const prizes = [
+      "NFT Boost!", "XP Boost!", "You WON 5 TIFFY!", "2x Mining Rate",
+      "Better Luck Next Time", "2x Mining Rate", "You Won 1 TIFFY!", "XP Boost"
+    ];
+    const sliceAngle = 360 / prizes.length;
+
+    let web3, user;
+    const providerOptions = {
+      walletconnect: {
+        package: window.WalletConnectProvider.default,
+        options: {
+          rpc: { 97: "https://data-seed-prebsc-1-s1.binance.org:8545/" },
+          chainId: 97
+        }
+      }
+    };
+    const web3Modal = new window.Web3Modal.default({ cacheProvider: false, providerOptions });
+
+    const wheel = document.getElementById("wheel");
+    const popup = document.getElementById("popup");
+    const spinSound = document.getElementById("spinSound");
+
+    document.getElementById("spinButton").onclick = async () => {
+      const instance = await web3Modal.connect();
+      web3 = new Web3(instance);
+      const accounts = await web3.eth.getAccounts();
+      user = accounts[0];
+
+      spinSound.play();
+      popup.style.display = "none";
+
+      const extra = Math.floor(Math.random() * 360);
+      const totalRotation = 360 * 5 + extra;
+      wheel.style.transform = `rotate(${totalRotation}deg)`;
+
+      const finalDeg = totalRotation % 360;
+      const index = Math.floor((360 - finalDeg + sliceAngle / 2) % 360 / sliceAngle);
+      const result = prizes[index];
+
+      setTimeout(() => {
+        popup.innerText = `Congratulations! ${result}`;
+        popup.style.display = "block";
+        if (result.includes("5 TIFFY")) sendReward(5);
+        else if (result.includes("1 TIFFY")) sendReward(1);
+      }, 5000);
+    };
+
+    async function sendReward(amount) {
+      try {
+        await fetch(BACKEND_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet: user, amount })
+        });
+        console.log("Reward sent");
+      } catch (err) {
+        console.error("Reward failed:", err);
+      }
+    }
+  </script>
+</body>
+</html>
