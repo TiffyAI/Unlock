@@ -6,55 +6,57 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
   <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       background: radial-gradient(circle, #000, #111);
       color: #00ffcc;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding: 80px;
-      overflow: hidden;
+      padding: 40px;
+      overflow-x: hidden;
+      overflow-y: auto;
       position: relative;
     }
     img.main {
-      width: 900px;
+      width: 600px;
       max-width: 90%;
-      border-radius: 24px;
-      margin-bottom: 50px;
-      box-shadow: 0 0 30px #00ffcc;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 20px #00ffcc;
     }
     h1 {
-      font-size: 80px;
-      margin-bottom: 30px;
-      text-shadow: 0 0 15px #00ffcc;
+      font-size: 48px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00ffcc;
     }
     p {
-      font-size: 32px;
-      margin-bottom: 40px;
+      font-size: 24px;
+      margin-bottom: 30px;
     }
     button {
-      padding: 30px 60px;
-      font-size: 36px;
+      padding: 18px 36px;
+      font-size: 22px;
       background: linear-gradient(45deg, #00ccff, #00ffcc);
       border: none;
-      border-radius: 20px;
+      border-radius: 12px;
       font-weight: bold;
-      margin: 20px;
+      margin: 12px;
       cursor: pointer;
-      box-shadow: 0 0 25px #00ffcc;
+      box-shadow: 0 0 20px #00ffcc;
       transition: transform 0.2s ease;
     }
     button:hover {
       transform: scale(1.05);
     }
     #popup {
-      background: rgba(0, 255, 204, 0.15);
-      border: 2px solid #00ffcc;
-      padding: 40px;
-      margin: 40px auto;
-      max-width: 600px;
-      font-size: 28px;
-      border-radius: 20px;
+      background: rgba(0, 255, 204, 0.12);
+      border: 1px solid #00ffcc;
+      padding: 25px;
+      margin: 30px auto;
+      max-width: 90%;
+      border-radius: 14px;
+      font-size: 20px;
       display: none;
       animation: fadeIn 0.6s ease-in-out;
     }
@@ -63,16 +65,16 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Glowing Floating Keyhole */
     .keyhole {
       position: absolute;
-      bottom: -150px;
-      width: 250px;
+      bottom: -100px;
+      width: 150px;
       height: auto;
       opacity: 0.8;
       animation: floatUp 12s linear infinite;
-      filter: drop-shadow(0 0 20px #00ffcc) drop-shadow(0 0 40px #00ffff);
+      filter: drop-shadow(0 0 15px #00ffcc) drop-shadow(0 0 25px #00ffff);
     }
+
     @keyframes floatUp {
       0% {
         transform: translateY(0) scale(1);
@@ -85,7 +87,7 @@
         opacity: 1;
       }
       100% {
-        transform: translateY(-120vh) scale(1.2);
+        transform: translateY(-120vh) scale(1.1);
         opacity: 0;
       }
     }
@@ -102,9 +104,8 @@
     <button onclick="proceedWalletConnect()">OK, Launch Wallet</button>
   </div>
 
-  <!-- Floating Glowing Keyholes -->
   <script>
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 8; i++) {
       const k = document.createElement('img');
       k.src = 'keyhole.png';
       k.className = 'keyhole';
@@ -112,9 +113,7 @@
       k.style.animationDelay = (Math.random() * 10) + 's';
       document.body.appendChild(k);
     }
-  </script>
 
-  <script>
     const UNLOCK_LINK = "https://tiffyai.github.io/unlock-verify/";
     const CLAIM_LINK = "https://tiffyai.github.io/Claim/";
     const WHEEL_LINK = "https://tiffyai.github.io/Lucky-Wheel/";
