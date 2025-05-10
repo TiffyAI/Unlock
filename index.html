@@ -12,36 +12,49 @@
       color: #00ffcc;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding: 50px;
+      padding: 80px;
+      overflow: hidden;
+      position: relative;
     }
-    img {
-      width: 300px;
-      border-radius: 16px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 20px #00ffcc;
+    img.main {
+      width: 900px;
+      max-width: 90%;
+      border-radius: 24px;
+      margin-bottom: 50px;
+      box-shadow: 0 0 30px #00ffcc;
     }
     h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
+      font-size: 80px;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px #00ffcc;
+    }
+    p {
+      font-size: 32px;
+      margin-bottom: 40px;
     }
     button {
-      padding: 15px 32px;
-      font-size: 18px;
+      padding: 30px 60px;
+      font-size: 36px;
       background: linear-gradient(45deg, #00ccff, #00ffcc);
       border: none;
-      border-radius: 10px;
+      border-radius: 20px;
       font-weight: bold;
-      margin: 10px;
+      margin: 20px;
       cursor: pointer;
-      box-shadow: 0 0 15px #00ffcc;
+      box-shadow: 0 0 25px #00ffcc;
+      transition: transform 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
     }
     #popup {
       background: rgba(0, 255, 204, 0.15);
-      border: 1px solid #00ffcc;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 300px;
-      border-radius: 12px;
+      border: 2px solid #00ffcc;
+      padding: 40px;
+      margin: 40px auto;
+      max-width: 600px;
+      font-size: 28px;
+      border-radius: 20px;
       display: none;
       animation: fadeIn 0.6s ease-in-out;
     }
@@ -49,18 +62,57 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Floating keyhole style */
+    .keyhole {
+      position: absolute;
+      bottom: -100px;
+      width: 60px;
+      height: auto;
+      opacity: 0.6;
+      animation: floatUp 10s linear infinite;
+    }
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-120vh) scale(1.2);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Unlock the Lucky Wheel</h1>
-  <img src="Unlock.png" alt="Unlock Wheel" />
-  <p>Win up to $60 TIFFY per spin!</p>
+  <img src="Unlock.png" alt="Unlock Wheel" class="main" />
+  <p>Win up to <strong>$60 TIFFY</strong> per spin!</p>
   <button onclick="handleClaimUnlock()">Unlock with Claim</button>
 
   <div id="popup">
     <p id="popupMessage">Clipboard ready...</p>
     <button onclick="proceedWalletConnect()">OK, Launch Wallet</button>
   </div>
+
+  <!-- Floating keyholes -->
+  <script>
+    for (let i = 0; i < 15; i++) {
+      const k = document.createElement('img');
+      k.src = 'keyhole.png';
+      k.className = 'keyhole';
+      k.style.left = Math.random() * 100 + 'vw';
+      k.style.animationDelay = (Math.random() * 10) + 's';
+      k.style.width = (Math.random() * 30 + 40) + 'px';
+      document.body.appendChild(k);
+    }
+  </script>
 
   <script>
     const UNLOCK_LINK = "https://tiffyai.github.io/unlock-verify/";
@@ -87,9 +139,7 @@
     let web3, user, contract;
 
     function handleClaimUnlock() {
-      // Copy link to clipboard
       navigator.clipboard.writeText(UNLOCK_LINK).then(() => {
-        // Show popup
         const popup = document.getElementById("popup");
         document.getElementById("popupMessage").innerText =
           "Hey! Let’s head over to your DApp — the link is already copied. Paste it into your wallet’s browser.";
@@ -108,10 +158,8 @@
       const now = Math.floor(Date.now() / 1000);
 
       if (now < parseInt(lastClaimed) + 86400) {
-        // Already claimed — allow access to wheel
         window.location.href = WHEEL_LINK;
       } else {
-        // Not claimed yet — ask to claim
         const goClaim = confirm("Seems you haven’t claimed yet today. Wanna go claim now?");
         if (goClaim) window.location.href = CLAIM_LINK;
       }
