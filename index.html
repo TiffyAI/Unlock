@@ -63,14 +63,15 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Floating keyhole style */
+    /* Glowing Floating Keyhole */
     .keyhole {
       position: absolute;
-      bottom: -100px;
-      width: 60px;
+      bottom: -150px;
+      width: 250px;
       height: auto;
-      opacity: 0.6;
-      animation: floatUp 10s linear infinite;
+      opacity: 0.8;
+      animation: floatUp 12s linear infinite;
+      filter: drop-shadow(0 0 20px #00ffcc) drop-shadow(0 0 40px #00ffff);
     }
     @keyframes floatUp {
       0% {
@@ -81,7 +82,7 @@
         opacity: 0.4;
       }
       50% {
-        opacity: 0.8;
+        opacity: 1;
       }
       100% {
         transform: translateY(-120vh) scale(1.2);
@@ -101,15 +102,14 @@
     <button onclick="proceedWalletConnect()">OK, Launch Wallet</button>
   </div>
 
-  <!-- Floating keyholes -->
+  <!-- Floating Glowing Keyholes -->
   <script>
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 12; i++) {
       const k = document.createElement('img');
       k.src = 'keyhole.png';
       k.className = 'keyhole';
       k.style.left = Math.random() * 100 + 'vw';
       k.style.animationDelay = (Math.random() * 10) + 's';
-      k.style.width = (Math.random() * 30 + 40) + 'px';
       document.body.appendChild(k);
     }
   </script>
